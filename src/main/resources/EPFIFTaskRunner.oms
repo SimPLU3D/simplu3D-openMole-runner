@@ -23,7 +23,7 @@ val explo = ExplorationTask(
 
 
 val javaTask = ScalaTask("val folderOut = newDir(); val r = EPFIFTaskRunner.run(data, folderOut, parameterFile, seed)") set (
-  libraries += workDirectory / "distribSimu-0.0.1-SNAPSHOT-shaded.jar",
+  libraries += workDirectory / "simplu3d-openMole-runner-0.0.1-SNAPSHOT-shaded.jar",
   parameterFile := workDirectory / scenar ,
   seed := 42L,
   inputs += (data, parameterFile, seed, dirName),
