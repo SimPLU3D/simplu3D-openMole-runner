@@ -1,0 +1,43 @@
+val r = Val[String]
+val seed = Val[Long]
+val folderOut = Val[File]
+var dirName = Val[String]
+var fileName = Val[String]
+val parameterFile = Val[File]
+val data = Val[File]
+
+val folderName = "dataBasicSimu/"
+val scenar = s"${folderName}scenario/parameters_iauidf_good.xml"
+//val shapes = s"${folderName}EstEnsemble/"
+//val shapes = s"${folderName}idf/"
+val shapes = s"${folderName}dep77/"
+val resultDir = "results_77_test"
+
+
+val rangeSeed = (42L to 42L)
+
+val explo = ExplorationTask(
+  //(seed in rangeSeed) x
+  (data in (workDirectory / shapes) withName dirName)
+)
+
+
+val javaTask = ScalaTask("val folderOut = newDir(); val r = EPFIFTaskRunner.run(data, folderOut, parameterFile, seed)") set (
+  libraries += workDirectory / "distribSimu-0.0.1-SNAPSHOT-shaded.jar",
+  parameterFile := workDirectory / scenar ,
+  seed := 42L,
+  inputs += (data, parameterFile, seed, dirName),
+  outputs += (r, folderOut, data, dirName)
+)
+
+val copyHook =  CopyFileHook(folderOut,  workDirectory / resultDir / "${dirName}/")
+
+val csvHook = AppendToCSVFileHook(workDirectory / resultDir / "ouput.csv", r) set (
+  csvHeader := "directory ; idpar ; number of objects ; sdp",
+  arraysOnSingleRow := true
+)
+
+
+val env = LocalEnvironment(1)
+
+explo -< (javaTask on env hook (copyHook,csvHook))
