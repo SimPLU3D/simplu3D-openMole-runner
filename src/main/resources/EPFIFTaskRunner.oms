@@ -22,7 +22,7 @@ val explo = ExplorationTask(
 )
 
 
-val javaTask = ScalaTask("val folderOut = newDir(); val r = EPFIFTaskRunner.run(data, folderOut, parameterFile, seed)") set (
+val javaTask = ScalaTask("val folderOut = newDir(); val r = EPFIFTaskRunner.run(data, dirName, folderOut, parameterFile, seed)") set (
   libraries += workDirectory / "simplu3d-openMole-runner-0.0.1-SNAPSHOT-shaded.jar",
   parameterFile := workDirectory / scenar ,
   seed := 42L,
@@ -38,6 +38,7 @@ val csvHook = AppendToCSVFileHook(workDirectory / resultDir / "ouput.csv", r) se
 )
 
 
-val env = LocalEnvironment(1)
+//val env = LocalEnvironment(6)
+val env = EGIEnvironment("vo.complex-systems.eu")
 
 explo -< (javaTask on env hook (copyHook,csvHook))

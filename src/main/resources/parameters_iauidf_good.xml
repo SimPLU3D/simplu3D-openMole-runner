@@ -56,7 +56,7 @@
         <!-- Indique si il s'agit d'un nombre absolu d'itérations true ou un nombre relatif 
         à la non amélioration de la configuration-->
         <param key="isAbsoluteNumber" value="false" />
-		<param key="nbiter" value="50000" />
+        <param key="nbiter" value="50000" />
         <param key="delta" value="5" />
         
         <param key="poisson" value="20" />
@@ -68,7 +68,7 @@
 		<param key="nbsave" value="5000000" />
         <!-- Visiteurs utilisés-->
         <!-- Sortie console -->
-        <param key="outputstreamvisitor" value="true" />
+        <param key="outputstreamvisitor" value="false" />
         <!-- Sortie viewer 3D -->
         <param key="visitorviewer" value="false" />
         <param key="showbackground" value="true" />
