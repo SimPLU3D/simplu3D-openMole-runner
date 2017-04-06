@@ -4,7 +4,7 @@ import fr.ign.cogit.simplu3d.experiments.openmole.EPFIFTask;
 import fr.ign.cogit.simplu3d.io.feature.AttribNames;
 
 public class EPFIFTaskRunner {
-  public static String run(File folder, File folderOut, File parameterFile,
+  public static String run(File folder, String dirName, File folderOut, File parameterFile,
       long seed) {
     AttribNames.setATT_CODE_PARC("IDPAR");
     EPFIFTask.USE_DEMO_SAMPLER = false;
@@ -12,12 +12,12 @@ public class EPFIFTaskRunner {
     EPFIFTask.FLOOR_SIZE = 3;
     EPFIFTask.MAX_PARCEL_AREA = 10000;
 
-    String[] folderSplit = folder.getAbsolutePath().split(File.separator);
-    String imu = folderSplit[folderSplit.length - 1];
+    //String[] folderSplit = folder.getAbsolutePath().split(File.separator);
+    String imu = dirName;//folderSplit[folderSplit.length - 1];
 
     String result = "";
     try {
-      result = EPFIFTask.run(folder, folderOut, parameterFile, seed);
+	result = EPFIFTask.run(folder, dirName, folderOut, parameterFile, seed);
     } catch (Exception e) {
       result = "# " + imu + "#\n";
       result += e.toString() + "\n";
@@ -25,7 +25,7 @@ public class EPFIFTaskRunner {
         result += "# " + s.toString() + "\n";
       result = "# " + imu + "#\n";
       System.out.println("el klodo");
-      // e.printStackTrace();
+      e.printStackTrace();
     }
     return result;
   }
@@ -41,7 +41,7 @@ public class EPFIFTaskRunner {
         "/home/imran/testoss/EPFIF/parameters_iauidf.xml");
     long seed = 42L;
     String res = "";
-    res = run(folder, folderOut, parameterFile, seed);
+    res = run(folder, numrep, folderOut, parameterFile, seed);
     System.out.println("result : " + res);
   }
 }
