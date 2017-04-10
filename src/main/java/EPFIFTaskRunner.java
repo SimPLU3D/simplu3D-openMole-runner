@@ -4,20 +4,20 @@ import fr.ign.cogit.simplu3d.experiments.openmole.EPFIFTask;
 import fr.ign.cogit.simplu3d.io.feature.AttribNames;
 
 public class EPFIFTaskRunner {
-  public static String run(File folder, String dirName, File folderOut, File parameterFile,
-      long seed) {
+  public static String run(File folder, String dirName, File folderOut,
+      File parameterFile, long seed) {
     AttribNames.setATT_CODE_PARC("IDPAR");
     EPFIFTask.USE_DEMO_SAMPLER = false;
     EPFIFTask.INTERSECTION = true;
     EPFIFTask.FLOOR_SIZE = 3;
     EPFIFTask.MAX_PARCEL_AREA = 10000;
 
-    //String[] folderSplit = folder.getAbsolutePath().split(File.separator);
-    String imu = dirName;//folderSplit[folderSplit.length - 1];
+    // String[] folderSplit = folder.getAbsolutePath().split(File.separator);
+    String imu = dirName;// folderSplit[folderSplit.length - 1];
 
     String result = "";
     try {
-	result = EPFIFTask.run(folder, dirName, folderOut, parameterFile, seed);
+      result = EPFIFTask.run(folder, dirName, folderOut, parameterFile, seed);
     } catch (Exception e) {
       result = "# " + imu + "#\n";
       result += e.toString() + "\n";
@@ -31,8 +31,7 @@ public class EPFIFTaskRunner {
   }
 
   public static void main(String[] args) {
-    String numrep = "77017686";// "77014063";// 77017278";// "75033409";//
-                               // "77017278";
+    String numrep = "77054334"; // "77059077";
     String foldName = "/home/imran/Téléchargements/Test_IAUIDF/Eval_EPF_2/";
     foldName = "/home/imran/.openmole/imran-OptiPlex-9010/webui/projects/dataBasicSimu/idf/";
     File folder = new File(foldName + numrep + "/");
