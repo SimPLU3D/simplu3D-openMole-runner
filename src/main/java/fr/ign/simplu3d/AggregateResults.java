@@ -1,4 +1,4 @@
-package fr.ign.cogit.simplu3d;
+package fr.ign.simplu3d;
 
 import java.io.File;
 import java.io.FileReader;
@@ -36,8 +36,15 @@ import org.opengis.feature.simple.SimpleFeatureType;
 public class AggregateResults {
 
 	public static void aggregateParcels(File inputDirectory, File inputCSV, File outputFile) throws Exception {
+		Stream<Path> stream = Files.find(Paths.get(inputDirectory.toURI()), 5, (filePath, fileAttr) -> filePath.endsWith("parcelle.shp"));
+		aggregateParcels(stream.map((path) -> path.getParent().toFile()).toArray(File[]::new), inputCSV, outputFile);
+		stream.close();
+	}
+
+	public static void aggregateParcels(File[] inputDirectories, File inputCSV, File outputFile) throws Exception {
 		Reader in = new FileReader(inputCSV);
-		Iterable<CSVRecord> records = CSVFormat.DEFAULT.withFirstRecordAsHeader().withDelimiter(';').withIgnoreEmptyLines().parse(in);
+		Iterable<CSVRecord> records = CSVFormat.DEFAULT.withFirstRecordAsHeader().withDelimiter(';').withIgnoreEmptyLines()
+		    .parse(in);
 		Map<String, List<String>> map = new HashMap<>();
 		for (CSVRecord record : records) {
 			if (record.size() == 4) {
@@ -48,8 +55,8 @@ public class AggregateResults {
 				map.put(par, Arrays.asList(nbobj, floorarea, dir));
 			}
 		}
+		in.close();
 		String specs = "the_geom:Polygon,id:String,imu:String,found:Boolean,processed:Boolean,nb_objects:Integer,floor_area:Double";
-		Stream<Path> stream = Files.find(Paths.get(inputDirectory.toURI()), 5, (filePath, fileAttr) -> filePath.endsWith("parcelle.shp"));
 		try {
 			FileDataStoreFactorySpi factory = new ShapefileDataStoreFactory();
 			DataStore dataStore = factory.createDataStore(outputFile.toURI().toURL());
@@ -64,12 +71,11 @@ public class AggregateResults {
 			ListFeatureCollection collection = new ListFeatureCollection(featureType);
 			featureStore.setTransaction(transaction);
 			int i = 1;
-			Iterator<Path> it = stream.iterator();
-			while (it.hasNext()) {
-				Path file = it.next();
-				System.out.println(file);
+			for (File file : inputDirectories) {
+				File parcelFile = new File(file, "parcelle.shp");
+				System.out.println(parcelFile);
 				try {
-					ShapefileDataStore store = new ShapefileDataStore(file.toUri().toURL());
+					ShapefileDataStore store = new ShapefileDataStore(parcelFile.toURI().toURL());
 					FeatureReader<SimpleFeatureType, SimpleFeature> featureReader = store.getFeatureReader();
 					while (featureReader.hasNext()) {
 						SimpleFeature feature = featureReader.next();
@@ -122,8 +128,13 @@ public class AggregateResults {
 	}
 
 	public static void aggregateBuildings(File inputDirectory, File outputFile) throws Exception {
-		String specsBuildings = "the_geom:Polygon,height:Double,area:Double,volume:Double";		
-		Stream<Path> streamB = Files.find(Paths.get(inputDirectory.toURI()), 100, (filePath, fileAttr) -> filePath.toString().endsWith("shp"));
+		Stream<Path> stream = Files.find(Paths.get(inputDirectory.toURI()), 100, (filePath, fileAttr) -> filePath.toString().endsWith("shp"));
+		aggregateBuildings((File[]) stream.map((path) -> path.getParent().toFile()).toArray(File[]::new), outputFile);
+		stream.close();
+	}
+
+	public static void aggregateBuildings(File[] inputDirectories, File outputFile) throws Exception {
+		String specsBuildings = "the_geom:Polygon,height:Double,area:Double,volume:Double";
 		try {
 			FileDataStoreFactorySpi factory = new ShapefileDataStoreFactory();
 			DataStore dataStoreBuildings = factory.createDataStore(outputFile.toURI().toURL());
@@ -138,30 +149,34 @@ public class AggregateResults {
 			ListFeatureCollection collectionB = new ListFeatureCollection(featureTypeBuildings);
 			featureStoreB.setTransaction(transactionB);
 			int building = 1;
-			Iterator<Path> it = streamB.iterator();
-			while (it.hasNext()) {
-				Path file = it.next();
-				System.out.println(file);
-				try {
-					ShapefileDataStore store = new ShapefileDataStore(file.toUri().toURL());
-					FeatureReader<SimpleFeatureType, SimpleFeature> featureReader = store.getFeatureReader();
-					while (featureReader.hasNext()) {
-						SimpleFeature feature = featureReader.next();
-						Object geom = feature.getDefaultGeometry();
-						double height = Double.parseDouble(feature.getAttribute("Hauteur").toString());
-						double area = Double.parseDouble(feature.getAttribute("Aire").toString());
-						double volume = Double.parseDouble(feature.getAttribute("Volume").toString());
-						Object[] values = new Object[] { geom, height, area, volume };
-						SimpleFeature simpleFeature = SimpleFeatureBuilder.build(typeB, values, String.valueOf(building++));
-						collectionB.add(simpleFeature);
+			for (File file : inputDirectories) {
+				Stream<Path> stream = Files.find(Paths.get(file.toURI()), 2,
+				    (filePath, fileAttr) -> filePath.toString().endsWith("shp"));
+				Iterator<Path> it = stream.iterator();
+				while (it.hasNext()) {
+					Path buildingFile = it.next();
+					try {
+						ShapefileDataStore store = new ShapefileDataStore(buildingFile.toUri().toURL());
+						FeatureReader<SimpleFeatureType, SimpleFeature> featureReader = store.getFeatureReader();
+						while (featureReader.hasNext()) {
+							SimpleFeature feature = featureReader.next();
+							Object geom = feature.getDefaultGeometry();
+							double height = Double.parseDouble(feature.getAttribute("Hauteur").toString());
+							double area = Double.parseDouble(feature.getAttribute("Aire").toString());
+							double volume = Double.parseDouble(feature.getAttribute("Volume").toString());
+							Object[] values = new Object[] { geom, height, area, volume };
+							SimpleFeature simpleFeature = SimpleFeatureBuilder.build(typeB, values, String.valueOf(building++));
+							collectionB.add(simpleFeature);
+						}
+						featureReader.close();
+						store.dispose();
+					} catch (MalformedURLException e) {
+						e.printStackTrace();
+					} catch (IOException e) {
+						e.printStackTrace();
 					}
-					featureReader.close();
-					store.dispose();
-				} catch (MalformedURLException e) {
-					e.printStackTrace();
-				} catch (IOException e) {
-					e.printStackTrace();
 				}
+				stream.close();
 			}
 			try {
 				featureStoreB.addFeatures(collectionB);
@@ -182,16 +197,25 @@ public class AggregateResults {
 		System.out.println("I'm finished with buildings");
 	}
 
+	public static void aggregate(File inputDirectory, File inputCSV, File inputResultDir, File outputParcelFile, File outputBuildingFile) throws Exception {
+		aggregateParcels(inputDirectory, inputCSV, outputParcelFile);
+		aggregateBuildings(inputResultDir, outputBuildingFile);
+	}
+
+	public static void run(String[] imu, File[] dataDir, File[] resultDir, File inputCSV, File aggregateOutputDir) throws Exception {
+		aggregateOutputDir.mkdirs();
+		aggregateParcels(dataDir, inputCSV, new File(aggregateOutputDir, "parcels.shp"));
+		aggregateBuildings(resultDir, new File(aggregateOutputDir, "buildings.shp"));
+	}
+
 	public static void main(String[] args) throws Exception {
-		String outputFile = "iauidf_77/parcels.shp";
+		String outputParcelFile = "iauidf_77/parcels.shp";
 		String inputDirectory = "iauidf_77/testdata";
 		String inputCSV = "iauidf_77/results/ouput.csv";
-		
+
 		String outputBuildingFile = "iauidf_77/buildings.shp";
 		String inputResultDir = "iauidf_77/results/.";
 
-		aggregateParcels(new File(inputDirectory), new File(inputCSV), new File(outputFile));
-		aggregateBuildings(new File(inputResultDir), new File(outputBuildingFile));
-		
+		aggregate(new File(inputDirectory), new File(inputCSV), new File(inputResultDir), new File(outputParcelFile), new File(outputBuildingFile));
 	}
 }
