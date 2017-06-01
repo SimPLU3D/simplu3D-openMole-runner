@@ -4,12 +4,14 @@ import fr.ign.cogit.simplu3d.experiments.openmole.EPFIFTask;
 import fr.ign.cogit.simplu3d.io.feature.AttribNames;
 
 public class EPFIFTaskRunner {
-  public static String run(File folder, String dirName, File folderOut, File parameterFile, long seed) {
+  public static String run(File folder, String dirName, File folderOut,
+      File parameterFile, long seed) {
     AttribNames.setATT_CODE_PARC("IDPAR");
     EPFIFTask.USE_DEMO_SAMPLER = false;
     EPFIFTask.INTERSECTION = true;
     EPFIFTask.FLOOR_SIZE = 3;
     EPFIFTask.MAX_PARCEL_AREA = 10000;
+    EPFIFTask.PARCEL_NAME = "parcelle_new.shp";
 
     // String[] folderSplit = folder.getAbsolutePath().split(File.separator);
     String imu = dirName;// folderSplit[folderSplit.length - 1];
@@ -33,7 +35,8 @@ public class EPFIFTaskRunner {
     String foldName = "/home/imran/.openmole/imran-OptiPlex-9010/webui/projects/dataBasicSimu/idf/";
     File folder = new File(foldName + numrep + "/");
     File folderOut = new File("/home/imran/testoss/out/" + numrep + "/");
-    File parameterFile = new File("/home/imran/testoss/EPFIF/parameters_iauidf.xml");
+    File parameterFile = new File(
+        "/home/imran/testoss/EPFIF/parameters_iauidf.xml");
     long seed = 42L;
     String res = "";
     res = run(folder, numrep, folderOut, parameterFile, seed);
