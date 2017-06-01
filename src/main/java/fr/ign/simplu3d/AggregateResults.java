@@ -130,6 +130,9 @@ public class AggregateResults {
                   case -69:
                     status = "FILTERED";
                     break;
+                  case -5:
+                    status = "MINIMUM PARCEL AREA TOO BIG";
+                    break;
                   default:
                     status = "PROCESSED";
                     area = Double.parseDouble(list.get(1));
