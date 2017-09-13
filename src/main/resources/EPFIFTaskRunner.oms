@@ -10,10 +10,11 @@ val inputCSV = Val[File]
 
 val folderName = "dataBasicSimu"
 val scenar = "scenario"
+val shapesDir = "dep77" 
 val paramFileName = "parameters_iauidf_good.xml"
 val directoriesToAnalyze  = Val[Array[File]]
 
-val baseInputDir = workDirectory / folderName / "dep77"
+val baseInputDir = workDirectory / folderName / shapesDir
 //val dirSource = ListDirectoriesSource(baseInputDir, directoriesToAnalyze, "7709091.*")
 val dirSource = ListDirectoriesSource(baseInputDir, directoriesToAnalyze)
 

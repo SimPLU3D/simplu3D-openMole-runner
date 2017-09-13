@@ -17,7 +17,7 @@
 	<param key="minwid" value="4" />
 	<param key="maxwid" value="15" />
 	<!-- Hauteur !-->
-	<param key="minheight" value ="0.5" />
+	<param key="minheight" value ="3" />
 	<param key="maxheight" value="25" />
 
 	<!-- Probabilités !-->
