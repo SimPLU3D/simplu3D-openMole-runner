@@ -7,6 +7,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 
+import fr.ign.simplu3d.EPFIFTaskRunner;
+
 public class IterativeSim {
 
 	public static void main(String[] args) throws FileNotFoundException, IOException {

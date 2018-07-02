@@ -37,6 +37,9 @@ import org.opengis.feature.simple.SimpleFeatureType;
 public class AggregateResults {
 
 	public static String PARCEL_NAME = "parcelle.shp";
+	
+	
+
 
 	/**
 	 * Aggregate the parcel results using the input data of the simulation and the
@@ -79,12 +82,13 @@ public class AggregateResults {
 		Map<String, List<String>> map = new HashMap<>();
 		for (CSVRecord record : records) {
 			// a proper record with all the necessary values
-			if (record.size() == 4) {
+			if (record.size() == 5) {
 				String dir = record.get(0).trim();
 				String par = record.get(1).trim();
 				String nbobj = record.get(2).trim();
 				String floorarea = record.get(3).trim();
-				map.put(par, Arrays.asList(nbobj, floorarea, dir));
+				String iteration = record.get(4).trim();
+				map.put(par, Arrays.asList(nbobj, floorarea, dir, iteration));
 			} else {
 				// a record with "#" around the parcel id: an exception was thrown
 				if (record.size() == 1) {
@@ -199,7 +203,7 @@ public class AggregateResults {
 	 */
 	public static void aggregateBuildings(File inputDirectory, File outputFile) throws Exception {
 		Stream<Path> stream = Files.find(Paths.get(inputDirectory.toURI()), 100,
-				(filePath, fileAttr) -> filePath.toString().endsWith("shp"));
+				(filePath, fileAttr) -> filePath.toString().endsWith("sampler.shp"));
 		aggregateBuildings((File[]) stream.map((path) -> path.getParent().toFile()).toArray(File[]::new), outputFile);
 		stream.close();
 	}
@@ -218,7 +222,7 @@ public class AggregateResults {
 		try {
 			FileDataStoreFactorySpi factory = new ShapefileDataStoreFactory();
 			DataStore dataStoreBuildings = factory.createDataStore(outputFile.toURI().toURL());
-			String featureTypeNameB = "Buildings";
+			String featureTypeNameB = "buildings";
 			SimpleFeatureType featureTypeBuildings = DataUtilities.createType(featureTypeNameB, specsBuildings);
 			dataStoreBuildings.createSchema(featureTypeBuildings);
 			Transaction transactionB = new DefaultTransaction("create");
@@ -232,7 +236,7 @@ public class AggregateResults {
 			for (File file : inputDirectories) {
 				// go through the entire file hierarchy to find the shapefiles to aggregate
 				Stream<Path> stream = Files.find(Paths.get(file.toURI()), 2,
-						(filePath, fileAttr) -> filePath.toString().endsWith("shp"));
+						(filePath, fileAttr) -> filePath.toString().endsWith("sampler.shp"));
 				Iterator<Path> it = stream.iterator();
 				while (it.hasNext()) {
 					Path buildingFile = it.next();
@@ -246,7 +250,7 @@ public class AggregateResults {
 							double area = Double.parseDouble(feature.getAttribute("Aire").toString());
 							double volume = Double.parseDouble(feature.getAttribute("Volume").toString());
 							String idpar = feature.getAttribute("idpar").toString();
-							String imu_dir = feature.getAttribute("imu_dir").toString();
+							String imu_dir = feature.getAttribute("idblock").toString();
 							Object[] values = new Object[] { geom, height, area, volume, idpar, imu_dir };
 							SimpleFeature simpleFeature = SimpleFeatureBuilder.build(typeB, values,
 									String.valueOf(building++));
@@ -328,11 +332,6 @@ public class AggregateResults {
 	}
 
 	public static void main(String[] args) throws Exception {
-		String inputDirectory = args[0];
-		String inputCSV = args[1];
-		String inputResultDir = args[2];
-		String outputDir = args[3];
-		aggregate(new File(inputDirectory), new File(inputCSV), new File(inputResultDir),
-				new File(outputDir, "parcels.shp"), new File(outputDir, "buildings.shp"));
+
 	}
 }
