@@ -1,9 +1,9 @@
 package fr.ign.simplu3d;
 import java.io.File;
 
-import fr.ign.cogit.simplu3d.experiments.iauidf.tool.ParcelAttributeTransfert;
-import fr.ign.cogit.simplu3d.experiments.openmole.EPFIFTask;
 import fr.ign.cogit.simplu3d.io.feature.AttribNames;
+import fr.ign.simplu3d.iauidf.openmole.EPFIFTask;
+import fr.ign.simplu3d.iauidf.tool.ParcelAttributeTransfert;
 
 public class EPFIFTaskRunner {
   public static String run(File folder, String dirName, File folderOut, File parameterFile, long seed) {
@@ -48,8 +48,8 @@ public class EPFIFTaskRunner {
 	ParcelAttributeTransfert.att_art_10_m_2 = "B2_HAUT_M";
 																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																									
 
-    String numrep = "12516";
-    EPFIFTask.inclusion_list.add("94022000AY0097");
+    String numrep = "8951";
+    EPFIFTask.inclusion_list.add("94055000AN0043");
     String foldName ="/home/mbrasebin/Documents/Donnees/IAUIDF/Input/Input1/dep_94_connected_openmole/dataBasicSimu/dep94/";
     
     

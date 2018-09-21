@@ -85,6 +85,11 @@
 			<version>1.2-SNAPSHOT</version>
 		</dependency>
 		<dependency>
+			<groupId>fr.ign.cogit</groupId>
+			<artifactId>simplu3d-iauidf</artifactId>
+			<version>1.2-SNAPSHOT</version>
+		</dependency>
+		<dependency>
 			<groupId>org.geotools</groupId>
 			<artifactId>gt-main</artifactId>
 			<version>${geotools.version}</version>
